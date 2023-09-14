@@ -27,32 +27,30 @@ function ViewUserForm() {
                 
             })
 
-            console.log(answer);
-            console.log( questions, doc_name, doc_desc);
         }, [])
 
     function select(que, option) {
 
-        console.log(que, option);
+
 
         var k = answer.findIndex((ele) => (ele.question === que));
         answer[k].answer = option;
         setAnswer(answer);
-        console.log(answer);
+   
     }
 
     function selectInput(que, option) {
 
-        console.log(que, option);
+    
         var k = answer.findIndex((ele) => (ele.question === que));
         answer[k].answer = option;
         setAnswer(answer);
-        console.log(answer);
+    
     }
 
     function selectCheck(e, que, option) {
 
-        console.log(e,que, option);
+ 
 
         var d = [];
         var k = answer.findIndex((ele) => (ele.question === que));
@@ -67,7 +65,7 @@ function ViewUserForm() {
         }
         answer[k].answer = d.join(",")
         setAnswer(answer);
-        console.log(answer);
+   
     }
 
     function regresar(){

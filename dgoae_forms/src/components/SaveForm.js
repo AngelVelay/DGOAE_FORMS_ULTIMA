@@ -17,7 +17,6 @@ const SaveForm = () => {
         `http://localhost:9000/getGlobalID?id=${id}`
       );
       setGlobal(request.data.gid);
-      console.log(request.data);
     }
 
     getGlobalID();

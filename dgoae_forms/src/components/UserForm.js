@@ -8,7 +8,7 @@ import CryptoJS from "crypto-js";
 
 import "./UserForm.css";
 
-import axios from "axios";
+import axios, { Axios } from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 
 function UserForm() {
@@ -24,20 +24,37 @@ function UserForm() {
   const [questions, setQuestions] = useState([]);
   const [isEncrypted, setIsEncrypted] = useState({});
   const [isEnabled, setisEnabled] = useState(null);
+  const [token, setToken] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+
+  const siteKey = process.env.REACT_APP_CAPTCHA_SITE_KEY;
 
   const encryptInformation = (wordTextPlain) => {
     var textoCifrado = CryptoJS.AES.encrypt(
       JSON.stringify(wordTextPlain),
-      "@DGOAE_3NCRYPT_1NF0RM4T10N"
+      process.env.REACT_APP_SECRET_KEY
     );
     return textoCifrado.toString();
   };
 
-  const captcha = useRef(null);
+  const captcha = useRef();
 
-  const onChange = () => {
+  const onChange = async () => {
+    let tokenCaptcha = captcha.current.getValue();
+
     if (captcha.current.getValue()) {
-      setcaptchaVerification(true);
+      
+
+      var request = await axios.post("http://localhost:9000/signup-with-recaptcha", {
+        token: tokenCaptcha,
+      });
+
+      console.log(request)
+
+      setcaptchaVerification(request?.data.success);
+
     }
   };
 
@@ -46,7 +63,6 @@ function UserForm() {
       var request = await axios.get(
         `http://localhost:9000/getform?global_id=${global_id}`
       );
-      console.log(request.data.questions);
       var question_data = request.data.questions;
       var doc_name = request.data.document_name;
       var doc_desc = request.data.document_description;
@@ -75,26 +91,21 @@ function UserForm() {
 
   function select(que, option, e) {
     setAnswer(answer);
-    console.log(que, option, e, answer);
 
     var k = answer.findIndex((ele) => ele.question === que);
     answer[k].answer = option;
     setAnswer(answer);
-    console.log(answer);
   }
 
   function selectInput(que, option, e) {
     setAnswer(answer);
-    console.log(que, option);
     var k = answer.findIndex((ele) => ele.question === que);
     answer[k].answer = option;
     setAnswer(answer);
-    console.log(answer);
   }
 
   function selectCheck(que, option, e) {
     setAnswer(answer);
-    console.log(e, que, option);
     var d = [];
     var k = answer.findIndex((ele) => ele.question === que);
     if (answer[k].answer) {
@@ -109,35 +120,9 @@ function UserForm() {
 
     answer[k].answer = d.join(",");
     setAnswer(answer);
-    console.log(answer);
   }
 
-
-
-  function submit() {
-    // questions.map((ele) => {
-    //   if (ele.required === true) {
-    //     var k = answer.findIndex((el) => el.question === ele.questionText);
-    //     if (k === -1 || answer[k].answer.trim() === "") {
-    //       alert("Preguntas no respondidas");
-    //     } else {
-    //       axios
-    //         .post(`http://localhost:9000/student_response`, {
-    //           global_id: global_id,
-    //           column: quest_excel,
-    //           doc_name: doc_name,
-    //           answer_data: [post_answer_data],
-    //         })
-    //         .then(() => {
-    //           navigate("/submitted/" + global_id);
-    //         })
-    //         .catch((error) => {
-    //           console.error("Error al enviar la respuesta:", error);
-    //         });
-    //     }
-    //   }
-    // });
-
+  async function submit() {
     answer.map((ele) => {
       if (isEncrypted === true) {
         post_answer_data[ele.question] = encryptInformation(ele.answer);
@@ -279,11 +264,7 @@ function UserForm() {
           {}
 
           <div className="recaptcha">
-            <ReCAPTCHA
-              ref={captcha}
-              sitekey="6LczbcwmAAAAAIrxDQ9f4j-Il98VaYtEBIG60AxL"
-              onChange={onChange}
-            />
+            <ReCAPTCHA ref={captcha} sitekey={siteKey} onChange={onChange} />
           </div>
 
           <div className="user_form_submit">

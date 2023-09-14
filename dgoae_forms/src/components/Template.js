@@ -21,7 +21,6 @@ function Template() {
 
   const createForm = async () => {
     const id_ = uuid();
-    console.log(id_, user.name);
     var question_list = [
       {
         questionText: "Pregunta1",
@@ -55,7 +54,6 @@ function Template() {
 
   const createFormRegist = async () => {
     const id_ = uuid();
-    console.log(id_, user.name);
     var question_list = [
       {
         questionText: "Nombre Completo",

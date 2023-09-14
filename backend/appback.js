@@ -118,7 +118,7 @@ appback.post("/add_question", async (req, res) => {
   const encryptInformation = (wordTextPlain) => {
     var textoCifrado = CryptoJS.AES.encrypt(
       JSON.stringify(wordTextPlain),
-      "@DGOAE_3NCRYPT_1NF0RM4T10N"
+      process.env.REACT_APP_SECRET_KEY
     );
     return textoCifrado.toString();
   };
@@ -126,7 +126,7 @@ appback.post("/add_question", async (req, res) => {
   const decryptInformation = (wordTextCipher) => {
     var bytes = CryptoJS.AES.decrypt(
       wordTextCipher,
-      "@DGOAE_3NCRYPT_1NF0RM4T10N"
+      process.env.REACT_APP_SECRET_KEY
     );
     var textoPlano = bytes.toString(CryptoJS.enc.Utf8);
     return textoPlano;
@@ -180,7 +180,7 @@ appback.post("/student_response", async (req, res) => {
   const encryptInformation = (wordTextPlain) => {
     var textoCifrado = CryptoJS.AES.encrypt(
       JSON.stringify(wordTextPlain),
-      "@DGOAE_3NCRYPT_1NF0RM4T10N"
+      process.env.REACT_APP_SECRET_KEY
     );
     return textoCifrado.toString();
   };
@@ -201,9 +201,6 @@ appback.post("/student_response", async (req, res) => {
         doc_name: docs_data.doc_name,
       });
       await newResponse.save();
-      console.log("Respuesta Guardada");
-
-
     } else {
       response.responses.push(docs_data.answer_data[0]);
 
@@ -226,7 +223,6 @@ function isEmptyObject(obj) {
 
 appback.get(`/getExcel`, async (req, res) => {
   const fid = req.query.id;
-  console.log("Golbal" + fid);
 
   try {
     const accessfile = await AllAccess.findOne({ file: fid }).exec();
@@ -275,8 +271,6 @@ appback.post(`/enable_disable`, async (req, res) => {
   res.send();
 });
 
-
-
 appback.get(`/getResponses`, async (req, res) => {
   try {
     const fid = req.query.id;
@@ -314,10 +308,8 @@ appback.get(`/getFormData`, async (req, res) => {
   const document_id = req.query.doc_id;
 
   try {
-
     const form = await Form.findOne({ IdPregunta: document_id });
     if (!form) {
-      console.log("Form not found");
       res.send({
         IdPregunta: form.IdPregunta,
         document_name: form.document_name,
@@ -325,7 +317,6 @@ appback.get(`/getFormData`, async (req, res) => {
         isEncrypted: form.isEncrypted,
       });
     } else {
-      console.log("Form found");
       res.send({
         IdPregunta: form.IdPregunta,
         document_name: form.document_name,
@@ -336,6 +327,32 @@ appback.get(`/getFormData`, async (req, res) => {
   } catch (error) {
     console.log(error);
   }
+});
+
+async function validateHuman(token) {
+  const secret = process.env.REACT_APP_CAPTCHA_SECRET_KEY;
+  const response = await fetch(
+    `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`,
+    {
+      method: "POST",
+    }
+  );
+  const data = await response.json();
+  console.log(data);
+  return data;
+}
+
+appback.post("/signup-with-recaptcha", async (req, res) => {
+  const formData = req.body;
+
+  const human = await validateHuman(formData.token);
+  console.log(human);
+  if (!human.success) {
+    res.status(400);
+    res.json({ errors: ["Error al entrar"] });
+    return;
+  }
+  res.send(human)
 });
 
 appback.listen(9000, () => {

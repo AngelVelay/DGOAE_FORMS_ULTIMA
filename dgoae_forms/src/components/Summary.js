@@ -34,10 +34,6 @@ function Summary() {
             rcols = request.data.columns;
             questions = request.questions;
 
-            console.log("Res: ", responses);
-            console.log("Size: ", rsize);
-            console.log("Cols: ", rcols);
-            console.log("Quest: ", questions);
 
             setResponses(responses);
             setRSize(rsize);

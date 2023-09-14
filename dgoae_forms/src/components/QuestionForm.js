@@ -96,7 +96,7 @@ function QuestionForm() {
   const encryptInformation = (wordTextPlain) => {
     var textoCifrado = CryptoJS.AES.encrypt(
       JSON.stringify(wordTextPlain),
-      "@DGOAE_3NCRYPT_1NF0RM4T10N"
+      process.env.REACT_APP_SECRET_KEY
     );
     return textoCifrado.toString();
   };
@@ -104,7 +104,7 @@ function QuestionForm() {
   const decryptInformation = (wordTextCipher) => {
     var bytes = CryptoJS.AES.decrypt(
       wordTextCipher,
-      "@DGOAE_3NCRYPT_1NF0RM4T10N"
+      process.env.REACT_APP_SECRET_KEY
     );
     var textoPlano = bytes.toString(CryptoJS.enc.Utf8);
     return textoPlano;
@@ -114,21 +114,18 @@ function QuestionForm() {
     var newQuestion = [...questions];
     newQuestion[i].questionText = _text;
     setQuestions(newQuestion);
-    console.log(newQuestion);
   }
 
   function addQuestionType(i, _type) {
     let qType = [...questions];
     qType[i].questionType = _type;
     setQuestions(qType);
-    console.log(qType);
   }
 
   function changeOptionValue(_value, i, j) {
     let optionsQuestions = [...questions];
     optionsQuestions[i].options[j].optionText = _value;
     setQuestions(optionsQuestions);
-    console.log(optionsQuestions);
   }
 
   function removeOption(i, j) {
@@ -136,7 +133,7 @@ function QuestionForm() {
     if (removeOptions[i].options.length > 1) {
       removeOptions[i].options.splice(j, 1);
       setQuestions(removeOptions);
-      console.log(removeOptions);
+     
     }
   }
 
@@ -147,7 +144,7 @@ function QuestionForm() {
         optionText: "Option" + (myquestions[i].options.length + 1),
       });
     } else {
-      console.log("Max 5 options");
+      
     }
     setQuestions(myquestions);
   }
@@ -175,7 +172,7 @@ function QuestionForm() {
 
   const sensitiveInformationQuestion = () => {
     setIsEncrypt(!isEncrypt);
-    console.log(isEncrypt);
+   
   };
 
   function addMoreQuestionField() {
@@ -287,24 +284,19 @@ function QuestionForm() {
 
   function doneAnswer(i) {
     var qs = [...questions];
-    console.log("Antes" + i + " " + qs[i].answer + " " + qs[i].answerkey);
     qs[i].answer = !qs[i].answer;
-    console.log("Despues" + i + " " + qs[i].answer + " " + qs[i].answerkey);
     setQuestions(qs);
   }
 
   function addAnswer(i) {
     var qs = [...questions];
-    console.log("Antes" + i + " " + qs[i].answer + " " + qs[i].answerkey);
     qs[i].answer = !qs[i].answer;
-    console.log("Despues" + i + " " + qs[i].answer + " " + qs[i].answerkey);
     setQuestions(qs);
   }
 
   const encryptSensitiveInformation = (i) => {
     var reqQuestion = [...questions];
     var encryptInfo = encryptInformation(JSON.stringify(reqQuestion[i]));
-    console.log("Encripta" + encryptInfo);
     setQuestions(encryptInfo);
   };
 
@@ -330,7 +322,6 @@ function QuestionForm() {
         }
       );
     } catch (err) {
-      console.log(err);
     }
 
     navigate(`/saveform/${id}`);
